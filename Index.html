@@ -1,0 +1,189 @@
+import os, zipfile, textwrap
+
+base = "/mnt/data/kuliahku_website"
+os.makedirs(base, exist_ok=True)
+
+html = r'''<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#8b78c8">
+<title>Kuliahku — Jadwal Kelas</title>
+<style>
+:root{--purple:#8b78c8;--purple-dark:#6552a4;--lav:#eee9fb;--lav2:#f7f4ff;--ink:#302b40;--muted:#777187;--line:#e7e1f3;--white:#fff;--pink:#f9e6f0;--green:#e3f5eb;--yellow:#fff2d5;--shadow:0 10px 30px #4b367512}
+*{box-sizing:border-box}body{margin:0;background:#faf9fd;color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.topbar{background:linear-gradient(120deg,#8b78c8,#ad9cde);color:white;padding:24px max(18px,calc((100% - 1150px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.brand{font-size:25px;font-weight:800;letter-spacing:-.6px}.brand span{font-weight:400}.topbar p{margin:3px 0 0;opacity:.9}.top-actions{display:flex;gap:8px;align-items:center}.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:650}.btn-light{background:#ffffffdf;color:#55458d}.btn-primary{background:var(--purple-dark);color:#fff}.btn-soft{background:var(--lav);color:var(--purple-dark)}.btn-danger{background:#ffebee;color:#a53c50}.wrap{max-width:1150px;margin:24px auto;padding:0 18px}.welcome{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:18px}.welcome h1{font-size:25px;margin:0}.welcome p{margin:4px 0;color:var(--muted)}.pill{display:inline-block;padding:5px 10px;background:var(--lav);color:var(--purple-dark);border-radius:999px;font-size:12px;font-weight:700}.tabs{display:flex;gap:8px;overflow:auto;padding:5px 0 14px}.tab{white-space:nowrap;border:1px solid var(--line);background:white;color:var(--muted);border-radius:12px;padding:10px 14px;font-weight:700}.tab.active{background:var(--purple);border-color:var(--purple);color:white}.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow);margin-bottom:18px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:15px}.panel h2{font-size:18px;margin:0}.sub{font-size:13px;color:var(--muted);margin:4px 0 0}.weekbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.days{display:flex;gap:6px;overflow:auto;margin:16px 0}.day{min-width:76px;border:1px solid var(--line);border-radius:12px;padding:9px 12px;text-align:center;background:#fff;color:var(--muted)}.day strong{display:block;color:var(--ink)}.day.active{background:var(--lav);border-color:#b6a7e6;color:var(--purple-dark)}.day.active strong{color:var(--purple-dark)}.schedule{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.class-card{border:1px solid var(--line);border-left:4px solid var(--purple);border-radius:14px;padding:14px;background:#fff}.class-card h3{font-size:15px;margin:7px 0 5px}.class-meta{color:var(--muted);font-size:13px}.class-time{font-weight:800;color:var(--purple-dark)}.empty{padding:28px;text-align:center;color:var(--muted);background:var(--lav2);border-radius:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.item{border:1px solid var(--line);border-radius:14px;padding:15px}.item h3{font-size:15px;margin:6px 0}.item p{margin:5px 0;color:var(--muted);font-size:13px}.item-top{display:flex;justify-content:space-between;gap:8px;align-items:start}.status{font-size:11px;font-weight:750;padding:4px 8px;border-radius:99px;background:var(--yellow);white-space:nowrap}.status.done{background:var(--green)}.notes{width:100%;min-height:220px;resize:vertical;border:1px solid var(--line);border-radius:12px;padding:14px;outline-color:var(--purple)}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:13px;font-weight:700;color:#5f5872}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;color:var(--ink)}.field textarea{min-height:75px}.wide{grid-column:1/-1}.admin-only{display:none}.hint{font-size:12px;color:var(--muted)}.modal-backdrop{position:fixed;inset:0;background:#241b3c70;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modal{background:white;border-radius:18px;padding:22px;width:min(420px,100%);box-shadow:0 20px 60px #0003}.modal h2{margin:0 0 6px}.modal p{color:var(--muted);font-size:13px}.modal .field{margin:12px 0}.footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}.notice{background:#fff6df;border:1px solid #f0dfad;padding:12px 14px;border-radius:12px;font-size:13px;margin-bottom:16px}
+@media(max-width:700px){.topbar{padding:20px 16px}.wrap{margin:17px auto;padding:0 12px}.welcome{align-items:flex-start;flex-direction:column}.schedule,.grid,.form-grid{grid-template-columns:1fr}.panel{padding:15px}.wide{grid-column:auto}.brand{font-size:23px}.top-actions{width:100%}.top-actions button{flex:1}}
+</style>
+</head>
+<body>
+<header class="topbar">
+ <div><div class="brand">Kuliah<span>ku</span> ✦</div><p>Ruang informasi kelas dalam satu tempat</p></div>
+ <div class="top-actions"><span id="roleBadge" class="pill" style="background:#ffffff30;color:white">Mode tamu</span><button id="loginBtn" class="btn btn-light">Login</button><button id="logoutBtn" class="btn btn-light" style="display:none">Keluar</button></div>
+</header>
+<main class="wrap">
+ <div class="welcome"><div><h1>Halo, teman kelas! 👋</h1><p>Jadwal, tugas, catatan, dan ujian kelasmu.</p></div><span id="todayLabel" class="pill"></span></div>
+ <div class="notice"><strong>Versi awal:</strong> data tersimpan di browser/perangkat ini. Login admin di versi demo bukan autentikasi aman dan perubahan tidak otomatis dibagikan ke perangkat teman. Untuk pemakaian satu kelas sungguhan, sambungkan Supabase (panduan ada di README).</div>
+ <nav class="tabs" aria-label="Menu utama">
+  <button class="tab active" data-tab="schedule">Jadwal mingguan</button><button class="tab" data-tab="tasks">Tugas & deadline</button><button class="tab" data-tab="notes">Catatan kuliah</button><button class="tab" data-tab="exams">Kalender ujian</button><button class="tab admin-only" data-tab="admin" id="adminTab">Kelola data</button>
+ </nav>
+ <section id="schedule" class="view">
+  <div class="panel"><div class="panel-head"><div><h2>Jadwal mingguan</h2><p class="sub">Pilih hari untuk melihat kelas.</p></div><button class="btn btn-primary admin-only" data-add="schedule">+ Tambah jadwal</button></div>
+   <div class="days" id="days"></div><div id="scheduleList" class="schedule"></div>
+  </div>
+ </section>
+ <section id="tasks" class="view" hidden><div class="panel"><div class="panel-head"><div><h2>Tugas & deadline</h2><p class="sub">Pantau tugas yang perlu diselesaikan.</p></div><button class="btn btn-primary admin-only" data-add="task">+ Tambah tugas</button></div><div id="taskList" class="grid"></div></div></section>
+ <section id="notes" class="view" hidden><div class="panel"><div class="panel-head"><div><h2>Catatan kuliah</h2><p class="sub">Catatan pribadi tersimpan di browser ini.</p></div><button id="saveNotes" class="btn btn-primary">Simpan catatan</button></div><textarea id="notesText" class="notes" placeholder="Tulis ringkasan materi, pertanyaan, atau pengingat..."></textarea><p class="hint">Catatan ini bersifat pribadi pada perangkat/browser ini.</p></div></section>
+ <section id="exams" class="view" hidden><div class="panel"><div class="panel-head"><div><h2>Kalender ujian</h2><p class="sub">Ujian tengah semester, akhir semester, dan kuis.</p></div><button class="btn btn-primary admin-only" data-add="exam">+ Tambah ujian</button></div><div id="examList" class="grid"></div></div></section>
+ <section id="admin" class="view" hidden><div class="panel"><div class="panel-head"><div><h2>Kelola data kelas</h2><p class="sub">Fitur demo. Untuk data bersama, hubungkan database seperti dijelaskan di README.</p></div></div><div class="form-grid"><div class="field"><label>Nama kelas</label><input id="className" placeholder="Contoh: Manajemen A"></div><div class="field"><label>Semester</label><input id="semester" placeholder="Contoh: Semester 5"></div><div class="field wide"><label>Pengumuman kelas</label><textarea id="announcement" placeholder="Tulis pengumuman singkat..."></textarea></div><div class="wide"><button class="btn btn-primary" id="saveSettings">Simpan pengaturan</button> <button class="btn btn-soft" id="exportData">Ekspor data JSON</button> <button class="btn btn-danger" id="resetData">Reset data demo</button></div></div><p class="hint">Untuk menambahkan item, buka tab terkait dan tekan tombol “Tambah”.</p></div></section>
+ <div id="announcementBanner" class="panel" style="display:none"></div>
+</main><div class="footer">Kuliahku · Template jadwal kelas · Ungu pastel</div>
+<div class="modal-backdrop" id="loginModal"><div class="modal"><h2>Login Kuliahku</h2><p>Mode demo untuk menguji tampilan. Bukan login aman untuk data kelas sungguhan.</p><div class="field"><label>Nama pengguna</label><input id="username" placeholder="mahasiswa atau admin"></div><div class="field"><label>Kata sandi demo</label><input id="password" type="password" placeholder="Masukkan kata sandi demo"></div><p class="hint">Demo: mahasiswa / kuliahku123 · admin / admin123</p><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-soft" id="cancelLogin">Batal</button><button class="btn btn-primary" id="doLogin">Masuk</button></div><p id="loginError" style="color:#b23c55"></p></div></div>
+<div class="modal-backdrop" id="editModal"><div class="modal"><h2 id="editTitle">Tambah data</h2><div id="editFields"></div><p id="editError" style="color:#b23c55"></p><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button class="btn btn-soft" id="cancelEdit">Batal</button><button class="btn btn-primary" id="saveEdit">Simpan</button></div></div></div>
+<script>
+const DAYS=['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+const initial={settings:{className:'Kelas Saya',semester:'Semester berjalan',announcement:''},schedule:[],tasks:[],exams:[]};
+let db=loadDB(), selectedDay=DAYS[Math.max(0,new Date().getDay()-1)]||'Senin', role='guest', editType='';
+function loadDB(){try{return JSON.parse(localStorage.getItem('kuliahku_db'))||structuredClone(initial)}catch(e){return JSON.parse(JSON.stringify(initial))}}
+function persist(){localStorage.setItem('kuliahku_db',JSON.stringify(db));render()}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function dateFmt(s){if(!s)return 'Belum ditentukan';let d=new Date(s+'T00:00:00');return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}
+function setTab(tab){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!==tab)}
+function render(){
+ document.title=`${db.settings.className||'Kuliahku'} — Jadwal Kelas`;
+ document.getElementById('todayLabel').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'});
+ document.querySelector('.welcome h1').textContent=`Halo, teman kelas! 👋`;
+ document.querySelector('.welcome p').textContent=`${db.settings.className||'Kelas Saya'} · ${db.settings.semester||'Semester berjalan'}`;
+ document.getElementById('announcementBanner').style.display=db.settings.announcement?'block':'none';document.getElementById('announcementBanner').innerHTML='<strong>📣 Pengumuman kelas</strong><p>'+esc(db.settings.announcement)+'</p>';
+ document.getElementById('days').innerHTML=DAYS.map(d=>`<button class="day ${selectedDay===d?'active':''}" data-day="${d}"><strong>${d.slice(0,3)}</strong><span>${d}</span></button>`).join('');
+ document.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{selectedDay=b.dataset.day;render()});
+ let sc=db.schedule.filter(x=>x.day===selectedDay).sort((a,b)=>(a.start||'').localeCompare(b.start||''));
+ document.getElementById('scheduleList').innerHTML=sc.length?sc.map(x=>`<article class="class-card"><div class="class-time">${esc(x.start||'--:--')} – ${esc(x.end||'--:--')}</div><h3>${esc(x.subject)}</h3><div class="class-meta">👤 ${esc(x.lecturer||'Dosen belum diisi')}<br>📍 ${esc(x.room||'Ruang belum diisi')}${x.mode?' · '+esc(x.mode):''}</div>${role==='admin'?`<p><button class="btn btn-soft" onclick="editItem('schedule','${x.id}')">Edit</button> <button class="btn btn-danger" onclick="deleteItem('schedule','${x.id}')">Hapus</button></p>`:''}</article>`).join(''):'<div class="empty" style="grid-column:1/-1">Belum ada jadwal untuk hari '+selectedDay+'. Admin dapat menambahkannya setelah data jadwal diterima.</div>';
+ document.getElementById('taskList').innerHTML=db.tasks.length?db.tasks.slice().sort((a,b)=>(a.due||'').localeCompare(b.due||'')).map(x=>`<article class="item"><div class="item-top"><span class="pill">${esc(x.course||'Mata kuliah')}</span><span class="status ${x.done?'done':''}">${x.done?'Selesai':'Belum selesai'}</span></div><h3>${esc(x.title)}</h3><p>Deadline: <strong>${dateFmt(x.due)}</strong></p><p>${esc(x.detail||'')}</p><button class="btn btn-soft" onclick="toggleTask('${x.id}')">${x.done?'Tandai belum selesai':'Tandai selesai'}</button>${role==='admin'?` <button class="btn btn-soft" onclick="editItem('task','${x.id}')">Edit</button> <button class="btn btn-danger" onclick="deleteItem('tasks','${x.id}')">Hapus</button>`:''}</article>`).join(''):'<div class="empty" style="grid-column:1/-1">Belum ada tugas. Tugas dan tenggat akan tampil di sini.</div>';
+ document.getElementById('examList').innerHTML=db.exams.length?db.exams.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(x=>`<article class="item"><span class="pill">${esc(x.kind||'Ujian')}</span><h3>${esc(x.subject)}</h3><p>📅 ${dateFmt(x.date)} ${x.time?'· '+esc(x.time):''}</p><p>📍 ${esc(x.room||'Lokasi menyusul')}</p><p>${esc(x.detail||'')}</p>${role==='admin'?`<button class="btn btn-soft" onclick="editItem('exam','${x.id}')">Edit</button> <button class="btn btn-danger" onclick="deleteItem('exams','${x.id}')">Hapus</button>`:''}</article>`).join(''):'<div class="empty" style="grid-column:1/-1">Belum ada tanggal ujian yang ditambahkan.</div>';
+ document.querySelectorAll('.admin-only').forEach(el=>el.style.display=role==='admin'?'inline-block':'none');
+ document.getElementById('roleBadge').textContent=role==='admin'?'Admin':role==='student'?'Mahasiswa':'Mode tamu';
+ document.getElementById('loginBtn').style.display=role==='guest'?'inline-block':'none';document.getElementById('logoutBtn').style.display=role==='guest'?'none':'inline-block';
+ document.getElementById('className').value=db.settings.className||'';document.getElementById('semester').value=db.settings.semester||'';document.getElementById('announcement').value=db.settings.announcement||'';
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+document.getElementById('loginBtn').onclick=()=>{document.getElementById('loginModal').style.display='flex';document.getElementById('loginError').textContent=''};
+document.getElementById('cancelLogin').onclick=()=>document.getElementById('loginModal').style.display='none';
+document.getElementById('doLogin').onclick=()=>{let u=document.getElementById('username').value.trim(),p=document.getElementById('password').value; if(u==='admin'&&p==='admin123')role='admin';else if(u==='mahasiswa'&&p==='kuliahku123')role='student';else{document.getElementById('loginError').textContent='Nama pengguna atau kata sandi demo tidak cocok.';return}document.getElementById('loginModal').style.display='none';render()};
+document.getElementById('logoutBtn').onclick=()=>{role='guest';setTab('schedule');render()};
+document.getElementById('saveNotes').onclick=()=>{localStorage.setItem('kuliahku_notes',document.getElementById('notesText').value);alert('Catatan tersimpan di browser ini.')};
+document.getElementById('notesText').value=localStorage.getItem('kuliahku_notes')||'';
+document.getElementById('saveSettings').onclick=()=>{if(role!=='admin')return;db.settings={className:document.getElementById('className').value||'Kelas Saya',semester:document.getElementById('semester').value||'Semester berjalan',announcement:document.getElementById('announcement').value};persist();alert('Pengaturan disimpan di browser ini.')};
+document.getElementById('exportData').onclick=()=>{let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kuliahku-data.json';a.click();URL.revokeObjectURL(a.href)};
+document.getElementById('resetData').onclick=()=>{if(role==='admin'&&confirm('Reset seluruh jadwal, tugas, ujian dan pengaturan demo?')){db=JSON.parse(JSON.stringify(initial));persist()}};
+function toggleTask(id){let x=db.tasks.find(x=>x.id===id);if(x){x.done=!x.done;persist()}}
+function deleteItem(type,id){if(role!=='admin'||!confirm('Hapus item ini?'))return;db[type]=db[type].filter(x=>x.id!==id);persist()}
+const fields={
+ schedule:[['day','Hari','select',DAYS],['subject','Mata kuliah','text'],['start','Jam mulai','time'],['end','Jam selesai','time'],['lecturer','Dosen','text'],['room','Ruang / tautan','text'],['mode','Mode','select',['Tatap muka','Online','Hybrid']]],
+ task:[['title','Nama tugas','text'],['course','Mata kuliah','text'],['due','Deadline','date'],['detail','Deskripsi / instruksi','textarea']],
+ exam:[['subject','Mata kuliah','text'],['kind','Jenis ujian','select',['Kuis','UTS','UAS','Presentasi','Lainnya']],['date','Tanggal','date'],['time','Jam','time'],['room','Ruang / tautan','text'],['detail','Catatan','textarea']]
+};
+function openEditor(type,item){if(role!=='admin')return;editType=type;let obj=item||{};document.getElementById('editTitle').textContent=(item?'Edit ':'Tambah ')+({schedule:'jadwal',task:'tugas',exam:'ujian'}[type]);document.getElementById('editError').textContent='';document.getElementById('editFields').innerHTML=fields[type].map(([key,label,kind,opts])=>`<div class="field"><label>${label}</label>${kind==='select'?`<select name="${key}">${opts.map(o=>`<option ${obj[key]===o?'selected':''}>${o}</option>`).join('')}</select>`:kind==='textarea'?`<textarea name="${key}">${esc(obj[key]||'')}</textarea>`:`<input name="${key}" type="${kind}" value="${esc(obj[key]||'')}" ${['subject','title'].includes(key)?'required':''}>`}</div>`).join('');document.getElementById('editModal').dataset.id=obj.id||'';document.getElementById('editModal').style.display='flex'}
+function editItem(type,id){let arr=type==='schedule'?db.schedule:type==='task'?db.tasks:db.exams;openEditor(type,arr.find(x=>x.id===id))}
+document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>openEditor(b.dataset.add,null));
+document.getElementById('cancelEdit').onclick=()=>document.getElementById('editModal').style.display='none';
+document.getElementById('saveEdit').onclick=()=>{if(role!=='admin')return;let data={};document.querySelectorAll('#editFields [name]').forEach(el=>data[el.name]=el.value.trim());if((data.subject===undefined&&data.title===undefined)||!(data.subject||data.title)){document.getElementById('editError').textContent='Isi nama mata kuliah atau nama tugas terlebih dahulu.';return}let id=document.getElementById('editModal').dataset.id||('id'+Date.now());data.id=id;let arr=editType==='schedule'?db.schedule:editType==='task'?db.tasks:db.exams;let idx=arr.findIndex(x=>x.id===id);if(idx>=0)arr[idx]={...arr[idx],...data};else arr.push({...data,done:false});document.getElementById('editModal').style.display='none';persist()};
+render();
+</script>
+</body></html>'''
+
+readme = r'''# Kuliahku — Website Jadwal Kelas
+
+## Isi paket
+- `index.html`: website responsif berdesain ungu pastel.
+- `supabase-schema.sql`: skema awal untuk database bersama (opsional, untuk tahap backend).
+- Fitur demo: jadwal mingguan, tugas/deadline, catatan lokal, kalender ujian, panel admin, ekspor data JSON, tampilan mobile.
+
+## Uji lokal
+1. Ekstrak ZIP.
+2. Buka `index.html` di browser.
+3. Login demo:
+   - Mahasiswa: `mahasiswa` / `kuliahku123`
+   - Admin: `admin` / `admin123`
+4. Login demo hanya untuk mencoba tampilan. Jangan gunakan kata sandi tersebut untuk data nyata.
+
+## Publikasikan lewat GitHub Pages
+1. Buka repository GitHub bernama `kuliahku`.
+2. Upload `index.html` ke **root** repository (sejajar dengan README, bukan di dalam folder lain), lalu Commit changes.
+3. Buka **Settings → Pages**. Pada Build and deployment, pilih `Deploy from a branch`, branch `main`, folder `/(root)`, lalu Save.
+4. Tunggu Actions deployment selesai dengan tanda centang hijau.
+5. Klik tautan **“Your site is live at…”** pada halaman Pages. Buka tautan itu di tab baru. Coba juga jendela Incognito/Private dan hard refresh.
+6. Jika masih 404, pastikan URL yang dibuka persis tautan Pages yang ditampilkan GitHub. Untuk repository bernama `kuliahku`, biasanya berbentuk `https://USERNAME.github.io/kuliahku/`; jika repository bernama `USERNAME.github.io`, bentuknya `https://USERNAME.github.io/`. Ganti USERNAME dengan nama akun GitHub yang benar.
+7. Pastikan nama file persis `index.html` (huruf kecil), berada di root, dan commit terbaru sudah masuk ke branch yang dipilih.
+
+## Batasan penting pada versi ini
+Versi ini adalah frontend statis. Login demo tidak aman, data jadwal/tugas/ujian disimpan di `localStorage` browser, dan catatan tersimpan di browser masing-masing. Jadi perubahan admin tidak otomatis terlihat di HP/perangkat mahasiswa lain. Jangan masukkan data pribadi atau kata sandi asli.
+
+Untuk penggunaan satu kelas yang benar-benar bersama, perlu backend:
+- **Supabase Auth** untuk login mahasiswa/admin yang sungguhan.
+- **Supabase Database** untuk menyimpan jadwal, tugas, ujian, pengumuman.
+- **Row Level Security (RLS)** agar hanya admin yang bisa mengubah data dan mahasiswa hanya bisa membaca/mengubah catatan miliknya.
+- Setelah kredensial Supabase dan kebijakan akses disiapkan, frontend perlu dihubungkan ke proyek tersebut. Jangan pernah menaruh `service_role` key di frontend.
+
+## Memasukkan jadwal asli
+Kirim file Excel/PDF/foto jadwal atau tempelkan tabel jadwal di chat. Saya bisa menyesuaikan data mata kuliah, hari, jam, dosen, ruang/tautan kelas, serta menambahkan daftar tugas dan ujian yang sudah diketahui.
+'''
+schema = r'''-- Skema awal Supabase untuk Kuliahku.
+-- Jalankan di Supabase SQL Editor setelah membuat project.
+-- Catatan: tabel ini belum menerapkan kebijakan RLS; tambahkan dan uji kebijakan sebelum dipakai dengan data nyata.
+
+create table if not exists public.class_schedule (
+  id bigint generated by default as identity primary key,
+  day_name text not null check (day_name in ('Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu')),
+  subject text not null,
+  start_time time,
+  end_time time,
+  lecturer text,
+  room text,
+  mode text,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.assignments (
+  id bigint generated by default as identity primary key,
+  title text not null,
+  course text,
+  due_date date,
+  details text,
+  is_done boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.exams (
+  id bigint generated by default as identity primary key,
+  subject text not null,
+  exam_type text,
+  exam_date date,
+  exam_time time,
+  room text,
+  details text,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.class_announcements (
+  id bigint generated by default as identity primary key,
+  message text not null,
+  created_at timestamptz not null default now()
+);
+
+-- Untuk catatan pribadi, gunakan tabel terpisah dengan user_id yang mengacu auth.users.
+create table if not exists public.student_notes (
+  id bigint generated by default as identity primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  title text,
+  body text not null default '',
+  updated_at timestamptz not null default now()
+);
+'''
+open(os.path.join(base,"index.html"),"w",encoding="utf-8").write(html)
+open(os.path.join(base,"README.md"),"w",encoding="utf-8").write(readme)
+open(os.path.join(base,"supabase-schema.sql"),"w",encoding="utf-8").write(schema)
+zip_path="/mnt/data/kuliahku_website_template.zip"
+with zipfile.ZipFile(zip_path,"w",zipfile.ZIP_DEFLATED) as z:
+    for name in ["index.html","README.md","supabase-schema.sql"]:
+        z.write(os.path.join(base,name),arcname=name)
+print(f"Website template created: {zip_path}")
